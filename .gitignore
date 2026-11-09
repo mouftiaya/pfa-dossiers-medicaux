@@ -1,0 +1,17 @@
+# Java / Maven
+target/
+.idea/
+*.iml
+
+# Embedded H2 database files
+data/
+
+# Angular / Node
+node_modules/
+dist/
+.angular/
+
+# OS / editor
+.DS_Store
+.vscode/*
+!.vscode/extensions.json
