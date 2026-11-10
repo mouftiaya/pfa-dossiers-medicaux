@@ -51,7 +51,7 @@ export class LoginComponent {
     this.loading = true;
     this.error = '';
     this.auth.login(this.username, this.password).subscribe({
-      next: () => this.router.navigate(['/patients']),
+      next: () => this.router.navigate(['/']), // the home guard picks the page of the role
       error: (err) => {
         this.loading = false;
         this.error =

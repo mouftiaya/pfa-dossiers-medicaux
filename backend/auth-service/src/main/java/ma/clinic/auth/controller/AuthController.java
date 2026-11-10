@@ -5,6 +5,7 @@ import ma.clinic.auth.dto.LoginRequest;
 import ma.clinic.auth.dto.LoginResponse;
 import ma.clinic.auth.model.AppUser;
 import ma.clinic.auth.repository.UserRepository;
+import ma.clinic.auth.service.AuditService;
 import ma.clinic.auth.service.TokenService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,18 +22,31 @@ public class AuthController {
     private final UserRepository users;
     private final PasswordEncoder passwordEncoder;
     private final TokenService tokenService;
+    private final AuditService audit;
 
-    public AuthController(UserRepository users, PasswordEncoder passwordEncoder, TokenService tokenService) {
+    public AuthController(UserRepository users, PasswordEncoder passwordEncoder, TokenService tokenService,
+                          AuditService audit) {
         this.users = users;
         this.passwordEncoder = passwordEncoder;
         this.tokenService = tokenService;
+        this.audit = audit;
     }
 
     @PostMapping("/login")
     public LoginResponse login(@Valid @RequestBody LoginRequest request) {
         AppUser user = users.findByUsername(request.username())
                 .filter(u -> passwordEncoder.matches(request.password(), u.getPassword()))
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid username or password"));
+                .orElse(null);
+        if (user == null) {
+            audit.log(request.username(), "LOGIN_FAILED", "Invalid username or password");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid username or password");
+        }
+        // Checked after the password so that a disabled account does not reveal that it exists
+        if (!user.isActive()) {
+            audit.log(user.getUsername(), "LOGIN_REFUSED", "Account disabled");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid username or password");
+        }
+        audit.log(user.getUsername(), "LOGIN_SUCCESS", null);
         return new LoginResponse(tokenService.generate(user), user.getUsername(), user.getRole().name());
     }
 }

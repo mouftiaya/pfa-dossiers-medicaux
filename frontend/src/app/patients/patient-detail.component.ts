@@ -1,7 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 
 import { AuthService } from '../auth/auth.service';
 import { Consultation, ConsultationForm } from '../consultations/consultation.model';
@@ -24,14 +24,6 @@ function emptyForm(): ConsultationForm {
   standalone: true,
   imports: [FormsModule, DatePipe, RouterLink],
   template: `
-    <header class="topbar">
-      <strong>Cabinet de diabétologie</strong>
-      <span class="spacer"></span>
-      <span class="muted">{{ username }}</span>
-      <button class="secondary" (click)="logout()">Déconnexion</button>
-    </header>
-
-    <main class="container">
       <a routerLink="/patients">← Retour à la liste</a>
 
       @if (error) {
@@ -53,6 +45,10 @@ function emptyForm(): ConsultationForm {
               <span class="muted">Antécédents médicaux</span><br />{{ p.medicalHistory || '—' }}
             </div>
           </div>
+          <p class="links">
+            <a [routerLink]="['/patients', p.id, 'results']">Résultats d'analyses</a>
+            <a [routerLink]="['/patients', p.id, 'evolution']">Évolution (HbA1c, glycémie…)</a>
+          </p>
         </div>
       }
 
@@ -130,12 +126,10 @@ function emptyForm(): ConsultationForm {
       } @empty {
         <p class="muted">Aucune consultation enregistrée pour ce patient.</p>
       }
-    </main>
   `,
 })
 export class PatientDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
-  private router = inject(Router);
   private auth = inject(AuthService);
   private patientService = inject(PatientService);
   private consultationService = inject(ConsultationService);
@@ -149,10 +143,6 @@ export class PatientDetailComponent implements OnInit {
   form: ConsultationForm = emptyForm();
   error = '';
   formError = '';
-
-  get username(): string {
-    return this.auth.session?.username ?? '';
-  }
 
   get isDoctor(): boolean {
     return this.auth.session?.role === 'DOCTOR';
@@ -199,10 +189,5 @@ export class PatientDetailComponent implements OnInit {
       next: () => this.loadConsultations(),
       error: () => (this.error = 'Suppression impossible.'),
     });
-  }
-
-  logout(): void {
-    this.auth.logout();
-    this.router.navigate(['/login']);
   }
 }

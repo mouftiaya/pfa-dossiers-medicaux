@@ -4,10 +4,12 @@ import { Observable, tap } from 'rxjs';
 
 import { API_URL } from '../config';
 
+export type Role = 'DOCTOR' | 'ASSISTANT' | 'ADMIN';
+
 export interface Session {
   token: string;
   username: string;
-  role: 'DOCTOR' | 'ASSISTANT' | 'ADMIN';
+  role: Role;
 }
 
 const STORAGE_KEY = 'clinic_session';

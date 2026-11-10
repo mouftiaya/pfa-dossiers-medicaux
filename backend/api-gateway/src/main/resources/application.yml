@@ -16,11 +16,23 @@ spring:
           uri: lb://patient-service
           predicates:
             - Path=/api/patients/**
-        # Next services go here, e.g.:
-        # - id: consultation-service
-        #   uri: lb://consultation-service
-        #   predicates:
-        #     - Path=/api/consultations/**
+        - id: consultation-service
+          uri: lb://consultation-service
+          predicates:
+            - Path=/api/consultations/**
+        - id: results-service
+          uri: lb://results-service
+          predicates:
+            - Path=/api/results/**
+        - id: ai-service
+          uri: lb://ai-service
+          predicates:
+            - Path=/api/ai/**
+        # User management and the activity journal are served by auth-service too
+        - id: auth-admin
+          uri: lb://auth-service
+          predicates:
+            - Path=/api/users/**,/api/audit-logs/**
       globalcors:
         add-to-simple-url-handler-mapping: true
         cors-configurations:
@@ -39,3 +51,5 @@ eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka
+  instance:
+    prefer-ip-address: true

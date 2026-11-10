@@ -1,7 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 
 import { AuthService } from '../auth/auth.service';
 import { DIABETES_LABELS, DiabetesType, Patient, PatientForm } from './patient.model';
@@ -25,14 +25,6 @@ function emptyForm(): PatientForm {
   standalone: true,
   imports: [FormsModule, DatePipe, RouterLink],
   template: `
-    <header class="topbar">
-      <strong>Cabinet de diabétologie</strong>
-      <span class="spacer"></span>
-      <span class="muted">{{ username }} ({{ roleLabel }})</span>
-      <button class="secondary" (click)="logout()">Déconnexion</button>
-    </header>
-
-    <main class="container">
       <div class="toolbar">
         <h2>Patients</h2>
         <input
@@ -133,13 +125,11 @@ function emptyForm(): PatientForm {
           </tbody>
         </table>
       </div>
-    </main>
   `,
 })
 export class PatientListComponent implements OnInit {
   private auth = inject(AuthService);
   private patientService = inject(PatientService);
-  private router = inject(Router);
 
   readonly labels = DIABETES_LABELS;
   readonly diabetesTypes = Object.keys(DIABETES_LABELS) as DiabetesType[];
@@ -151,17 +141,8 @@ export class PatientListComponent implements OnInit {
   error = '';
   formError = '';
 
-  get username(): string {
-    return this.auth.session?.username ?? '';
-  }
-
   get isDoctor(): boolean {
     return this.auth.session?.role === 'DOCTOR';
-  }
-
-  get roleLabel(): string {
-    const role = this.auth.session?.role;
-    return role === 'DOCTOR' ? 'Médecin' : role === 'ASSISTANT' ? 'Assistant(e)' : 'Administrateur';
   }
 
   ngOnInit(): void {
@@ -214,10 +195,5 @@ export class PatientListComponent implements OnInit {
       next: () => this.load(),
       error: () => (this.error = 'Suppression impossible.'),
     });
-  }
-
-  logout(): void {
-    this.auth.logout();
-    this.router.navigate(['/login']);
   }
 }

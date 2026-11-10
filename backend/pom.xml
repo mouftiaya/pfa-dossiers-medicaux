@@ -16,5 +16,7 @@
         <module>auth-service</module>
         <module>patient-service</module>
         <module>consultation-service</module>
+        <module>results-service</module>
+        <module>ai-service</module>
     </modules>
 </project>

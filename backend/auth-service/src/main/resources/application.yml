@@ -19,8 +19,10 @@ eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka
+  instance:
+    prefer-ip-address: true
 
 jwt:
-  # Must be the SAME value in auth-service and patient-service (at least 32 characters).
+  # Must be the SAME value in every service (auth, patient, consultation, results, ai): at least 32 characters.
   secret: ${JWT_SECRET:change-this-secret-in-production-0123456789}
   expiration-minutes: 480

@@ -27,6 +27,10 @@ public class AppUser {
     @Column(nullable = false)
     private Role role;
 
+    // The default lets "ddl-auto: update" add this column to an existing table that already has users
+    @Column(nullable = false, columnDefinition = "boolean default true")
+    private boolean active = true;
+
     protected AppUser() {
     }
 
@@ -48,7 +52,23 @@ public class AppUser {
         return password;
     }
 
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public Role getRole() {
         return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }

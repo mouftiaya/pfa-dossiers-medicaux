@@ -4,6 +4,7 @@ import java.util.List;
 
 import jakarta.validation.Valid;
 import ma.clinic.consultation.dto.ConsultationRequest;
+import ma.clinic.consultation.dto.DiagnosisRequest;
 import ma.clinic.consultation.model.Consultation;
 import ma.clinic.consultation.repository.ConsultationRepository;
 import org.springframework.http.HttpStatus;
@@ -34,6 +35,19 @@ public class ConsultationController {
     @GetMapping
     public List<Consultation> listForPatient(@RequestParam Long patientId) {
         return consultations.findByPatientIdOrderByConsultationDateDescIdDesc(patientId);
+    }
+
+    @GetMapping("/{id}")
+    public Consultation get(@PathVariable Long id) {
+        return find(id);
+    }
+
+    /** Used by ai-service when the doctor approves or modifies a suggestion: updates only the diagnosis. */
+    @PutMapping("/{id}/diagnosis")
+    public Consultation updateDiagnosis(@PathVariable Long id, @Valid @RequestBody DiagnosisRequest request) {
+        Consultation consultation = find(id);
+        consultation.setDiagnosis(request.diagnosis());
+        return consultations.save(consultation);
     }
 
     @PostMapping
