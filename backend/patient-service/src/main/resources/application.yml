@@ -1,0 +1,33 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: patient-service
+  config:
+    import: optional:configserver:${CONFIG_SERVER_URL:http://localhost:8888}
+  datasource:
+    # Default: embedded H2 database stored in ./data (nothing to install).
+    # For PostgreSQL set DB_URL=jdbc:postgresql://localhost:5432/patientdb, DB_USER and DB_PASSWORD.
+    url: ${DB_URL:jdbc:h2:file:./data/patientdb}
+    username: ${DB_USER:sa}
+    password: ${DB_PASSWORD:}
+  jpa:
+    hibernate:
+      ddl-auto: update   # dev only: creates/updates tables automatically
+    open-in-view: false
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka}
+  instance:
+    prefer-ip-address: true
+
+jwt:
+  # Must be the SAME value as in auth-service (at least 32 characters).
+  secret: ${JWT_SECRET:change-this-secret-in-production-0123456789}
+
+# Shared secret for service-to-service calls that are not made on behalf of a user
+internal:
+  api-key: ${INTERNAL_API_KEY:change-this-internal-key-in-production}

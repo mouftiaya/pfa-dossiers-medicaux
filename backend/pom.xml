@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Aggregator: lets you open / build all services at once (IntelliJ: File > Open > backend/pom.xml) -->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>ma.clinic</groupId>
+    <artifactId>diabetes-clinic-backend</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>eureka-server</module>
+        <module>api-gateway</module>
+        <module>auth-service</module>
+        <module>patient-service</module>
+        <module>consultation-service</module>
+        <module>results-service</module>
+        <module>ai-service</module>
+        <module>glucose-monitoring-service</module>
+        <module>notification-service</module>
+    </modules>
+</project>

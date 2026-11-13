@@ -1,0 +1,44 @@
+server:
+  port: 8084
+  error:
+    include-message: always
+    include-binding-errors: always
+
+spring:
+  application:
+    name: results-service
+  config:
+    import: optional:configserver:${CONFIG_SERVER_URL:http://localhost:8888}
+  datasource:
+    # Default: embedded H2 database stored in ./data (nothing to install).
+    # For PostgreSQL set DB_URL=jdbc:postgresql://localhost:5432/resultsdb, DB_USER and DB_PASSWORD.
+    url: ${DB_URL:jdbc:h2:file:./data/resultsdb}
+    username: ${DB_USER:sa}
+    password: ${DB_PASSWORD:}
+  jpa:
+    hibernate:
+      ddl-auto: update   # dev only: creates/updates tables automatically
+    open-in-view: false
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka}
+  instance:
+    prefer-ip-address: true
+
+jwt:
+  # Must be the SAME value as in auth-service (at least 32 characters).
+  secret: ${JWT_SECRET:change-this-secret-in-production-0123456789}
+
+results:
+  # Where the uploaded analysis files (PDF / images) are stored. Not committed to Git.
+  upload-dir: ${UPLOAD_DIR:./uploads}
+
+# Shared secret for service-to-service calls that are not made on behalf of a user
+internal:
+  api-key: ${INTERNAL_API_KEY:change-this-internal-key-in-production}

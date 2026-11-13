@@ -1,0 +1,7 @@
+CREATE DATABASE authdb;
+CREATE DATABASE patientdb;
+CREATE DATABASE consultationdb;
+CREATE DATABASE resultsdb;
+CREATE DATABASE aidb;
+CREATE DATABASE glucosedb;
+CREATE DATABASE notificationdb;

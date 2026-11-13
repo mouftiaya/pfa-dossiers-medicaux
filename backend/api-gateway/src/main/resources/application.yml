@@ -1,0 +1,70 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  config:
+    import: optional:configserver:${CONFIG_SERVER_URL:http://localhost:8888}
+  cloud:
+    gateway:
+      routes:
+        # lb://<name> = look the service up in Eureka and load-balance
+        - id: auth-service
+          uri: lb://auth-service
+          predicates:
+            - Path=/api/auth/**
+        - id: patient-service
+          uri: lb://patient-service
+          predicates:
+            - Path=/api/patients/**
+        - id: consultation-service
+          uri: lb://consultation-service
+          predicates:
+            - Path=/api/consultations/**
+        - id: results-service
+          uri: lb://results-service
+          predicates:
+            - Path=/api/results/**
+        - id: ai-service
+          uri: lb://ai-service
+          predicates:
+            - Path=/api/ai/**
+        # User management and the activity journal are served by auth-service too
+        - id: auth-admin
+          uri: lb://auth-service
+          predicates:
+            - Path=/api/users/**,/api/audit-logs/**
+        # Portal accounts of the patients (created by the assistant) are served by auth-service too
+        - id: patient-accounts
+          uri: lb://auth-service
+          predicates:
+            - Path=/api/patient-accounts/**
+        - id: glucose-monitoring-service
+          uri: lb://glucose-monitoring-service
+          predicates:
+            - Path=/api/glucose/**
+        - id: notification-service
+          uri: lb://notification-service
+          predicates:
+            - Path=/api/alerts/**
+      globalcors:
+        add-to-simple-url-handler-mapping: true
+        cors-configurations:
+          '[/**]':
+            allowedOrigins:
+              - "http://localhost:4200"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka}
+  instance:
+    prefer-ip-address: true

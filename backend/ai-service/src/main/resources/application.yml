@@ -1,0 +1,49 @@
+server:
+  port: 8085
+
+spring:
+  application:
+    name: ai-service
+  config:
+    import: optional:configserver:${CONFIG_SERVER_URL:http://localhost:8888}
+  datasource:
+    # Default: embedded H2 database stored in ./data (nothing to install).
+    # For PostgreSQL set DB_URL=jdbc:postgresql://localhost:5432/aidb, DB_USER and DB_PASSWORD.
+    url: ${DB_URL:jdbc:h2:file:./data/aidb}
+    username: ${DB_USER:sa}
+    password: ${DB_PASSWORD:}
+  jpa:
+    hibernate:
+      ddl-auto: update   # dev only: creates/updates tables automatically
+    open-in-view: false
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka}
+  instance:
+    prefer-ip-address: true
+
+jwt:
+  # Must be the SAME value as in auth-service (at least 32 characters).
+  secret: ${JWT_SECRET:change-this-secret-in-production-0123456789}
+
+internal:
+  # Shared secret for service-to-service calls (header X-Internal-Key). Same value in every service.
+  api-key: ${INTERNAL_API_KEY:change-this-internal-key-in-production}
+
+ai:
+  glucose-risk:
+    # The AI never alerts after a single measurement: it watches the weeks of history of each patient and only
+    # reports a persistent problem (too high, or too low, for most of the last 6 weeks).
+    enabled: ${GLUCOSE_RISK_ENABLED:true}
+    cron: ${GLUCOSE_RISK_CRON:0 0 2 * * *}   # every day at 02:00
+    window-days: 42
+    min-days-with-data: 28
+    min-readings: 40
+    min-weeks-with-data: 4
+    min-readings-per-week: 5
+    week-high-percent: 50
+    week-low-percent: 15
+    persistent-weeks-percent: 75
+

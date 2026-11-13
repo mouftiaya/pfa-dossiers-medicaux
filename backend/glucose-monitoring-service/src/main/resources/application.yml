@@ -1,0 +1,41 @@
+server:
+  port: 8086
+
+spring:
+  application:
+    name: glucose-monitoring-service
+  config:
+    import: optional:configserver:${CONFIG_SERVER_URL:http://localhost:8888}
+  datasource:
+    # Default: embedded H2 database stored in ./data (nothing to install).
+    # For PostgreSQL set DB_URL=jdbc:postgresql://localhost:5432/glucosedb, DB_USER and DB_PASSWORD.
+    url: ${DB_URL:jdbc:h2:file:./data/glucosedb}
+    username: ${DB_USER:sa}
+    password: ${DB_PASSWORD:}
+  jpa:
+    hibernate:
+      ddl-auto: update   # dev only: creates/updates tables automatically
+    open-in-view: false
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka}
+  instance:
+    prefer-ip-address: true
+
+jwt:
+  # Must be the SAME value as in auth-service (at least 32 characters).
+  secret: ${JWT_SECRET:change-this-secret-in-production-0123456789}
+
+internal:
+  # Shared key for service-to-service calls (header X-Internal-Key).
+  api-key: ${INTERNAL_API_KEY:change-this-internal-key-in-production}
+
+glucose:
+  # Test helper: lets a patient generate weeks of fake measurements (POST /api/glucose/me/demo-history).
+  # Set GLUCOSE_DEMO_ENABLED=false when the application is used for real.
+  demo:
+    enabled: ${GLUCOSE_DEMO_ENABLED:true}
+  # Daily check for patients who stopped measuring (default: every day at 09:00).
+  absence-check-cron: "0 0 9 * * *"

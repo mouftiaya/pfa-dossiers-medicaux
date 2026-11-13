@@ -1,0 +1,19 @@
+# PostgreSQL for the microservices (one database per service, one server for simplicity).
+# Start:  docker compose up -d
+# Stop:   docker compose down        (add -v to also delete the data)
+services:
+  postgres:
+    image: postgres:16
+    container_name: clinic-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      # Runs only the first time, on an empty volume: creates one database per service
+      - ./docker/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+
+volumes:
+  pgdata:

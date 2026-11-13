@@ -1,0 +1,5 @@
+package ma.clinic.notification.model;
+
+public enum AlertType {
+    HIGH_GLUCOSE, LOW_GLUCOSE, UNUSUAL_VARIATION, PERSISTENT_HIGH, PERSISTENT_LOW, NO_MEASUREMENT, CRITICAL_LAB_RESULT
+}

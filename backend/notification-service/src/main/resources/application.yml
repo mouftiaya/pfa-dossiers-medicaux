@@ -1,0 +1,59 @@
+server:
+  port: 8087
+
+spring:
+  application:
+    name: notification-service
+  config:
+    import: optional:configserver:${CONFIG_SERVER_URL:http://localhost:8888}
+  datasource:
+    # Default: embedded H2 database stored in ./data (nothing to install).
+    # For PostgreSQL set DB_URL=jdbc:postgresql://localhost:5432/notificationdb, DB_USER and DB_PASSWORD.
+    url: ${DB_URL:jdbc:h2:file:./data/notificationdb}
+    username: ${DB_USER:sa}
+    password: ${DB_PASSWORD:}
+  jpa:
+    hibernate:
+      ddl-auto: update   # dev only: creates/updates tables automatically
+    open-in-view: false
+  # Only needed when notifications.email.enabled=true (SmtpEmailSender):
+  # mail:
+  #   host: smtp.example.com
+  #   port: 587
+  #   username: ...
+  #   password: ...
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_URL:http://localhost:8761/eureka}
+  instance:
+    prefer-ip-address: true
+
+jwt:
+  # Must be the SAME value as in auth-service (at least 32 characters).
+  secret: ${JWT_SECRET:change-this-secret-in-production-0123456789}
+
+internal:
+  # Shared key for service-to-service calls (header X-Internal-Key).
+  api-key: ${INTERNAL_API_KEY:change-this-internal-key-in-production}
+
+# Alert detection rules (glucose thresholds themselves come from each event).
+alerts:
+  dedup-hours: 6              # no new alert of the same type for the same patient while an open one is younger than this
+  variation-delta: 100        # mg/dL between two consecutive measurements
+  variation-max-hours: 6      # ... taken at most this many hours apart
+  persistent-count: 5         # consecutive measurements all out of the target range
+  # false (default): a single measurement never raises an alert; the AI service analyses weeks of history instead.
+  # true: the old behaviour (an alert as soon as one measurement is out of range), only if the clinic wants it.
+  instant-glucose-enabled: ${INSTANT_GLUCOSE_ALERTS:false}
+  ai-dedup-days: 30           # no new AI alert of the same kind for a patient while an open one is younger than this
+
+# Messages sent to the patient (never contain medical information).
+notifications:
+  clinic-name: Cabinet de diabétologie
+  clinic-phone: 05 00 00 00 00
+  min-interval-minutes: 360   # max one message per channel per patient in this period (CRITICAL alerts are never throttled)
+  email:
+    enabled: false            # false: messages are only logged; true: sent through SMTP (spring.mail.*)
+    from: no-reply@clinic.local
